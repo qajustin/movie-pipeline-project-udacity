@@ -84,14 +84,17 @@ jobs:
 
 
 
+
     - name: Build and Push Docker Image
       working-directory: starter/frontend
       env:
         IMAGE_TAG: latest
         REPO_NAME: frontend
+        ECR_REGISTRY: 265572311361.dkr.ecr.us-east-1.amazonaws.com
       run: |
-        docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag ${{ steps.login-ecr.outputs.registry }}/$REPO_NAME:$IMAGE_TAG .
-        docker push ${{ steps.login-ecr.outputs.registry }}/$REPO_NAME:$IMAGE_T
+        docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
+
 
 
     - name: Configure Kubeconfig
@@ -99,11 +102,14 @@ jobs:
        aws eks update-kubeconfig --name udacity-project4 --region us-east-1
 
 
+
     - name: Deploy Docker Image to Amazon EKS
       working-directory: starter/frontend/k8s
       env:
         IMAGE_TAG: latest
         REPO_NAME: frontend
+        ECR_REGISTRY: 265572311361.dkr.ecr.us-east-1.amazonaws.com
       run: |
-          kustomize edit set image frontend=${{ steps.login-ecr.outputs.registry }}/$REPO_NAME:$IMAGE_TAG
-          kustomize build | kubectl apply -f -
+        kustomize edit set image frontend=$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
+        kustomize build | kubectl apply -f -
+
