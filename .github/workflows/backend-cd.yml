@@ -91,7 +91,7 @@ jobs:
 
     - name: Update Kubeconfig
       run:
-       aws eks update-kubeconfig --name udacity-project4 --region us-east-1
+       aws eks update-kubeconfig --name udacity-project5 --region us-east-1
 
 
     - name: Deploy Docker Image to Amazon EKS
@@ -101,7 +101,7 @@ jobs:
         REPO_NAME: backend
         ECR_REGISTRY: 265572311361.dkr.ecr.us-east-1.amazonaws.com
       run: |
-        aws eks update-kubeconfig --name udacity-project4 --region us-east-1
+        aws eks update-kubeconfig --name udacity-project5 --region us-east-1
         kustomize edit set image backend=$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
         kustomize build | kubectl apply -f -
 
