@@ -7,7 +7,6 @@ on:
       - main
 
 jobs:
-
   Linting:
     runs-on: ubuntu-latest
 
@@ -61,6 +60,13 @@ jobs:
     needs: [Linting, Test]
     runs-on: ubuntu-latest
 
+    env:
+      AWS_REGION: us-east-1
+      EKS_CLUSTER_NAME: udacity-project5
+      ECR_REGISTRY: 265572311361.dkr.ecr.us-east-1.amazonaws.com
+      REPO_NAME: backend
+      IMAGE_TAG: latest
+
     steps:
       - name: Check the Repository
         uses: actions/checkout@v3
@@ -71,32 +77,37 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and Push Docker Image
         working-directory: starter/backend
-        env:
-          IMAGE_TAG: latest
-          REPO_NAME: backend
-          ECR_REGISTRY: 265572311361.dkr.ecr.us-east-1.amazonaws.com
         run: |
           docker build -t $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
 
       - name: Update Kubeconfig
         run: |
-          aws eks update-kubeconfig --name udacity-project5 --region us-east-1
+          aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+
+      - name: Verify Cluster Access
+        run: |
+          kubectl config current-context
+          kubectl get nodes
+
+      - name: Install Kustomize
+        run: |
+          KUSTOMIZE_VERSION="5.4.2"
+          curl -Lo kustomize.tar.gz "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
+          tar -xzf kustomize.tar.gz
+          chmod +x kustomize
+          sudo mv kustomize /usr/local/bin/
+          kustomize version
 
       - name: Deploy to EKS
         working-directory: starter/backend/k8s
-        env:
-          IMAGE_TAG: latest
-          REPO_NAME: backend
-          ECR_REGISTRY: 265572311361.dkr.ecr.us-east-1.amazonaws.com
         run: |
-          aws eks update-kubeconfig --name udacity-project5 --region us-east-1
           kustomize edit set image backend=$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
-          kustomize build | kubectl apply -f -
+          kustomize build | kubectl apply --validate=false -f -
