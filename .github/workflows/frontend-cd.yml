@@ -90,7 +90,7 @@ jobs:
       env:
         IMAGE_TAG: latest
         REPO_NAME: frontend
-        ECR_REGISTRY: 057024489761.dkr.ecr.us-east-1.amazonaws.com
+        ECR_REGISTRY: 057024489761.dkr.ecr.us-east-1.amazonaws.com/frontend
       run: |
         docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
@@ -108,7 +108,7 @@ jobs:
       env:
         IMAGE_TAG: latest
         REPO_NAME: frontend
-        ECR_REGISTRY: 265572311361.dkr.ecr.us-east-1.amazonaws.com
+        ECR_REGISTRY: 057024489761.dkr.ecr.us-east-1.amazonaws.com/frontend
       run: |
         kustomize edit set image frontend=$ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
         kustomize build | kubectl apply -f -
