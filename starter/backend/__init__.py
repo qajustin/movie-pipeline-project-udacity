@@ -1,16 +1,12 @@
 import os
 from flask import Flask
-
-try:
-    from .movies import movies_api
-except ImportError:
-    from movies import movies_api
+from flask_cors import CORS
+from .movies.movies_api import movies_api
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 app.register_blueprint(movies_api)
 
-# Start app
 if __name__ == "__main__":
     app.run(
         debug=True,
