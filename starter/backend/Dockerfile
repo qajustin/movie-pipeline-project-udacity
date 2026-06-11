@@ -21,11 +21,10 @@ RUN apk add --no-cache \
 RUN pip install --no-cache-dir --upgrade pip pipenv
 
 COPY Pipfile Pipfile.lock ./
-
 RUN pipenv install --system --deploy --verbose
 
 COPY . .
 
 EXPOSE 5000
 
-CMD ["uwsgi", "--http", ":5000", "--master", "--enable-threads", "--module", "__init__:app"]
+CMD ["uwsgi", "--http", ":5000", "--master", "--enable-threads", "--wsgi-file", "app.py", "--callable", "app"]
