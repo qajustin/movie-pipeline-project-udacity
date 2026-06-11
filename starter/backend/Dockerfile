@@ -3,28 +3,29 @@ FROM public.ecr.aws/docker/library/python:3.10-alpine
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV CFLAGS="-Wno-error=incompatible-pointer-types"
 
 WORKDIR /app
 
-RUN adduser -u 1000 -D app && \
-    apk update && \
-    apk add --no-cache \
-      pcre \
-      pcre-dev \
-      build-base \
-      gcc \
-      linux-headers \
-      openssl \
-      openssl-dev \
-      libffi-dev \
-      musl-dev \
-      postgresql-dev && \
-    pip install --no-cache-dir pipenv
+RUN apk add --no-cache \
+    build-base \
+    gcc \
+    linux-headers \
+    musl-dev \
+    python3-dev \
+    pcre \
+    pcre-dev \
+    openssl-dev \
+    libffi-dev
 
-COPY Pipfile Pipfile.lock /app/
+RUN pip install --no-cache-dir --upgrade pip pipenv
 
-RUN pipenv install --system --deploy
+COPY Pipfile Pipfile.lock ./
 
-COPY . /app
+RUN pipenv install --system --deploy --verbose
+
+COPY . .
+
+EXPOSE 5000
 
 CMD ["uwsgi", "--http", ":5000", "--master", "--enable-threads", "--wsgi-file", "app.py", "--callable", "app"]
