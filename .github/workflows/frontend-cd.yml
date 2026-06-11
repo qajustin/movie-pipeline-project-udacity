@@ -62,7 +62,7 @@ jobs:
       ECR_REGISTRY: 057024489761.dkr.ecr.us-east-1.amazonaws.com
       REPO_NAME: frontend
       IMAGE_TAG: latest
-      CLUSTER_NAME: udacity-project5
+      CLUSTER_NAME: cluster
 
     steps:
       - name: Check the Repository
