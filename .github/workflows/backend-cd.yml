@@ -16,24 +16,24 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Code checkout
         uses: actions/checkout@v3
-      - name: Setup Python
+      - name: Python download
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Cache pipenv virtualenv
+      - name: Cache pipenv
         uses: actions/cache@v3
         with:
           path: ~/.local/share/virtualenvs
           key: pipenv-${{ runner.os }}-${{ hashFiles('starter/backend/Pipfile.lock') }}
           restore-keys: pipenv-${{ runner.os }}-
-      - name: Install pipenv
+      - name: Installing pipenv
         run: pip install pipenv
       - name: Install dependencies
         working-directory: starter/backend
         run: pipenv install --dev
-      - name: Run lint
+      - name: Run linting
         working-directory: starter/backend
         run: pipenv run lint
 
@@ -97,16 +97,16 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-      - name: Login to Amazon ECR
+      - name: Login to ECR
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v2
-      - name: Update kubeconfig
+      - name: Update kube
         run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
       - name: Install kustomize
         run: |
           curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
           sudo mv kustomize /usr/local/bin/
-      - name: Deploy to Kubernetes
+      - name: Deploy to EKS
         working-directory: starter/backend/k8s
         env:
           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
