@@ -27,10 +27,10 @@ jobs:
           restore-keys: pipenv-${{ runner.os }}-
       - name: Install pipenv
         run: pip install pipenv
-      - name: Install dependencies
+      - name: Install dependency
         working-directory: starter/backend
         run: pipenv install --dev
-      - name: Run lint
+      - name: Run linting
         working-directory: starter/backend
         run: pipenv run lint
 
@@ -64,6 +64,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Build Docker image
+      - name: Docker image build
         working-directory: starter/backend
         run: docker build --tag=mp-backend:latest .
