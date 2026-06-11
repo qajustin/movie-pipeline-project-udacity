@@ -67,7 +67,7 @@ jobs:
     env:
       AWS_REGION: us-east-1
       EKS_CLUSTER_NAME: udacity-project5
-      ECR_REGISTRY: 057024489761.dkr.ecr.us-east-1.amazonaws.com
+      ECR_REGISTRY: 057024489761.dkr.ecr.us-east-1.amazonaws.com/backend
       REPO_NAME: backend
       IMAGE_TAG: ${{ github.sha }}
 
