@@ -7,10 +7,16 @@ function MovieList({ onMovieClick }) {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_MOVIE_API_URL}/movies`)
+      .get('http://ad5ddf7e249594be78742bc2f86c63ae-859203249.us-east-1.elb.amazonaws.com/movies')
       .then((response) => {
         console.log('API response:', response.data);
-        setMovies(response.data?.movies || []);
+
+        if (Array.isArray(response.data?.movies)) {
+          setMovies(response.data.movies);
+        } else {
+          console.error('Expected { movies: [] } but got:', response.data);
+          setMovies([]);
+        }
       })
       .catch((error) => {
         console.error('Error fetching movies:', error);
@@ -20,7 +26,7 @@ function MovieList({ onMovieClick }) {
 
   return (
     <ul>
-      {(movies || []).map((movie) => (
+      {movies.map((movie) => (
         <li className="movieItem" key={movie.id} onClick={() => onMovieClick(movie)}>
           {movie.title}
         </li>
