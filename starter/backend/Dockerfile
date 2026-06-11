@@ -28,4 +28,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["uwsgi", "--http", ":5000", "--master", "--enable-threads", "--wsgi-file", "__init__.py", "--callable", "app"]
+CMD ["uwsgi", "--http", ":5000", "--master", "--enable-threads", "--module", "__init__:app"]
