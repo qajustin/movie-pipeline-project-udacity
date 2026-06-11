@@ -1,9 +1,5 @@
 import os
-from flask import Flask
-from flask_cors import CORS
-from .movies_api import movies_api
-
-app = Flask(__name__)
+from flask import__)from flask import Flask
 CORS(app)
 app.register_blueprint(movies_api)
 
@@ -13,3 +9,7 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=int(os.getenv("FLASK_RUN_PORT", 5000)),
     )
+from flask_cors import CORS
+
+from .movies.movies_api import movies_api
+
